@@ -1,3 +1,23 @@
+# Introduction
+
+This repository contains Obsidian plugins and utility scripts for managing a shared Obsidian vault.
+The plugins live under their own subfolders and are installed by copying them into the vault's `.obsidian/plugins/` directory.
+
+# code-block-fold
+
+Adds two editor commands — **Toggle fold all code blocks** and **Toggle fold code block at cursor** — that collapse fenced code blocks to a single preview line.
+The fold state is stored inside the file itself (a `{fold}` marker in the opening fence), so it persists across sessions and syncs across machines.
+
+**Install:** copy the `code-block-fold/` folder into `<vault>/.obsidian/plugins/`.
+
+# per-machine-workspace
+
+In a shared vault (e.g. synced via Dropbox), Obsidian opens whichever file was last open on *any* machine.
+This plugin fixes that: it tracks the last opened file per machine (identified by hostname) and restores it on startup.
+State is stored in the plugin's `data.json`, which syncs alongside the vault and holds one entry per machine — they never overwrite each other.
+
+**Install:** copy the `per-machine-workspace/` folder into `<vault>/.obsidian/plugins/`, then enable it under Settings → Community Plugins.
+
 # LabArchives Reorganization Scripts
 
 These scripts reorganize a raw LabArchives offline export into a clean,
