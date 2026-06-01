@@ -1,0 +1,19 @@
+.code-fold-widget {
+  display: inline-block;
+  color: var(--text-muted);
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 1px 8px;
+  font-family: var(--font-monospace);
+  font-size: var(--font-smaller);
+  cursor: pointer;
+  vertical-align: middle;
+  user-select: none;
+  transition: background-color 0.1s ease;
+}
+
+.code-fold-widget:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}

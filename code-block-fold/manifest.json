@@ -1,0 +1,10 @@
+{
+  "id": "code-block-fold",
+  "name": "Code Block Fold",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Fold code blocks in the editor, showing only a preview of the first line.",
+  "author": "User",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}

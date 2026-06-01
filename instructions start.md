@@ -1,0 +1,4 @@
+We want to work on obsidian through a shared Dropbox Folder, but since there is no user segmentation - each time we open the Obsidian app, we see the last open page of another user. Please write the following plugin: The plugin detects the name of the computer or the absolute path of the obsidian vault. The plugin tracks the opened files of the user, and saves in a local file under .obsidian folder (or the folder of the plugin, whichever is appropriate) the name of the last opened file. When the user opens the vault, the plugin detects the name of the computer or the absolute path of the obsidian vault, and opens the last opened file of that user. The plugin should not edit any file (besides the file that tracks the state of opened files).
+
+If anything is unclear, or there are implementations decisions to be made, please ask me before you start writing the code.
+ 
