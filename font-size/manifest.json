@@ -1,0 +1,10 @@
+{
+  "id": "font-size",
+  "name": "Font Size",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Increase, decrease, or remove font size on selected text.",
+  "author": "mkali",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}

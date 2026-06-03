@@ -1,0 +1,10 @@
+{
+  "id": "vault-comments",
+  "name": "Vault Comments",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Comment and notification system for shared Obsidian vaults.",
+  "author": "mkali",
+  "authorUrl": "",
+  "isDesktopOnly": true
+}

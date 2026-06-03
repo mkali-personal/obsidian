@@ -1,0 +1,10 @@
+/* Each step multiplies/divides by 1.2 (a comfortable visual increment). */
+.font-size-plus-1  { font-size: 1.20em; }
+.font-size-plus-2  { font-size: 1.44em; }
+.font-size-plus-3  { font-size: 1.73em; }
+.font-size-plus-4  { font-size: 2.07em; }
+
+.font-size-minus-1 { font-size: 0.83em; }
+.font-size-minus-2 { font-size: 0.69em; }
+.font-size-minus-3 { font-size: 0.58em; }
+.font-size-minus-4 { font-size: 0.48em; }
