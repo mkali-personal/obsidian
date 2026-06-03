@@ -8,7 +8,7 @@ const VIEW_TYPE = 'vault-comments-panel';
 // ── Comment parsing ───────────────────────────────────────────────────────────
 // Comment format in the markdown file:
 //
-//   > [!comment] @creator → #notify/name1 #notify/name2
+//   > [!comment] @creator → #member/name1 #member/name2
 //   > <!-- ts:1717123456789 -->
 //   > Comment content here.
 //
@@ -28,10 +28,10 @@ function parseComments(filePath, content) {
     const creatorMatch = title.match(/@(\S+)/);
     const creator      = creatorMatch ? creatorMatch[1] : '?';
 
-    const notifyTags = [];
-    const tagRe = /#notify\/(\S+)/g;
+    const memberTags = [];
+    const tagRe = /#member\/(\S+)/g;
     let tm;
-    while ((tm = tagRe.exec(title)) !== null) notifyTags.push(tm[1]);
+    while ((tm = tagRe.exec(title)) !== null) memberTags.push(tm[1]);
 
     // Collect callout body (lines starting with >)
     let ts = 0;
@@ -49,7 +49,7 @@ function parseComments(filePath, content) {
       filePath,
       lineFrom:    i,
       creator,
-      notifyTags,
+      memberTags,
       ts,
       preview: bodyLines.filter(l => l.trim()).join(' ').slice(0, 120),
     });
@@ -86,10 +86,11 @@ class CommentsPanel extends ItemView {
       return;
     }
 
-    const lastSeen = this.plugin.getLastSeen();
-    const comments = await this.plugin.scanComments();
-    const unread   = comments
-      .filter(c => c.ts > lastSeen && c.notifyTags.includes(username))
+    const lastSeen   = this.plugin.getLastSeen();
+    const subscribed = this.plugin.getSubscribedTags();
+    const comments   = await this.plugin.scanComments();
+    const unread     = comments
+      .filter(c => c.ts > lastSeen && c.memberTags.some(t => subscribed.includes(t)))
       .sort((a, b) => b.ts - a.ts);
 
     // ── Header ──
@@ -152,13 +153,32 @@ class VaultCommentsSettingTab extends PluginSettingTab {
       .setName('Your username')
       .setDesc(
         `Identifies you on this machine (${this.plugin.hostname}). ` +
-        'Use the same name others will type after #notify/.'
+        'Use the same name others will type after #member/.'
       )
       .addText(text => text
         .setPlaceholder('e.g. mkali')
         .setValue(this.plugin.getUsername() || '')
         .onChange(async value => {
           this.plugin.data.users[this.plugin.hostname] = value.trim();
+          await this.plugin.persistData();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName('Additional tags to follow')
+      .setDesc(
+        'Comma-separated list of extra #member/ tags to monitor on this machine ' +
+        '(e.g. physics-team, lab-members). Leave blank to follow only your username.'
+      )
+      .addText(text => text
+        .setPlaceholder('e.g. physics-team, lab-members')
+        .setValue((this.plugin.data.extraTags?.[this.plugin.hostname] || []).join(', '))
+        .onChange(async value => {
+          if (!this.plugin.data.extraTags) this.plugin.data.extraTags = {};
+          this.plugin.data.extraTags[this.plugin.hostname] = value
+            .split(',')
+            .map(t => t.trim().replace(/^#member\//, '').replace(/^#/, ''))
+            .filter(Boolean);
           await this.plugin.persistData();
         })
       );
@@ -170,7 +190,7 @@ class VaultCommentsSettingTab extends PluginSettingTab {
 class VaultCommentsPlugin extends Plugin {
   async onload() {
     this.hostname = os.hostname();
-    this.data     = await this.loadData() || { users: {}, lastSeen: {} };
+    this.data     = await this.loadData() || { users: {}, lastSeen: {}, extraTags: {} };
     this._cache   = new Map(); // filePath → { mtime, comments }
 
     this._refreshPanel = debounce(async () => {
@@ -226,8 +246,13 @@ class VaultCommentsPlugin extends Plugin {
     }));
   }
 
-  getUsername() { return this.data.users[this.hostname] || null; }
-  getLastSeen() { return this.data.lastSeen[this.hostname] || 0; }
+  getUsername()      { return this.data.users[this.hostname] || null; }
+  getLastSeen()      { return this.data.lastSeen[this.hostname] || 0; }
+  getSubscribedTags() {
+    const username = this.getUsername();
+    const extra    = this.data.extraTags?.[this.hostname] || [];
+    return username ? [username, ...extra] : extra;
+  }
 
   async persistData() { await this.saveData(this.data); }
 
@@ -238,11 +263,11 @@ class VaultCommentsPlugin extends Plugin {
   }
 
   async updateBadge() {
-    const username = this.getUsername();
-    if (!username) { this.ribbonIcon.removeClass('has-unread'); return; }
-    const lastSeen = this.getLastSeen();
-    const comments = await this.scanComments();
-    const hasUnread = comments.some(c => c.ts > lastSeen && c.notifyTags.includes(username));
+    const subscribed = this.getSubscribedTags();
+    if (!subscribed.length) { this.ribbonIcon.removeClass('has-unread'); return; }
+    const lastSeen   = this.getLastSeen();
+    const comments   = await this.scanComments();
+    const hasUnread  = comments.some(c => c.ts > lastSeen && c.memberTags.some(t => subscribed.includes(t)));
     this.ribbonIcon.toggleClass('has-unread', hasUnread);
   }
 
@@ -293,15 +318,30 @@ class VaultCommentsPlugin extends Plugin {
       new Notice('Set your username in Settings → Vault Comments first.');
       return;
     }
-    const ts       = Date.now();
-    const cursor   = editor.getCursor();
-    const lineText = editor.getLine(cursor.line);
-    const atStart  = lineText.slice(0, cursor.ch).trim() === '';
-    const prefix   = atStart ? '' : '\n';
-    const titleLine = `> [!comment] @${username} → #notify/`;
+    const ts        = Date.now();
+    const cursor    = editor.getCursor();
+    const lineText  = editor.getLine(cursor.line);
+    const atStart   = lineText.slice(0, cursor.ch).trim() === '';
+    const prefix    = atStart ? '' : '\n';
+    // Template ends with #member (no slash) — the slash is inserted below as
+    // a simulated keystroke so Obsidian opens its tag autocomplete dropdown.
+    const titleLine = `> [!comment] @${username} → #member`;
     const template  = `${prefix}${titleLine}\n> <!-- ts:${ts} -->\n> `;
     editor.replaceRange(template, cursor);
-    editor.setCursor({ line: cursor.line + (atStart ? 0 : 1), ch: titleLine.length });
+    const notifyLine = cursor.line + (atStart ? 0 : 1);
+    editor.setCursor({ line: notifyLine, ch: titleLine.length });
+
+    // Dispatch "/" as a real user-input transaction so Obsidian's tag
+    // autocomplete treats it as genuine typing and opens the dropdown.
+    const cm = editor.cm;
+    if (cm) {
+      const pos = cm.state.selection.main.head;
+      cm.dispatch({
+        changes:   { from: pos, to: pos, insert: '/' },
+        selection:  { anchor: pos + 1 },
+        userEvent: 'input.type',
+      });
+    }
   }
 }
 
