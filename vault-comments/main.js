@@ -203,6 +203,16 @@ class VaultCommentsPlugin extends Plugin {
 
     this.addSettingTab(new VaultCommentsSettingTab(this.app, this));
 
+    this.registerEvent(
+      this.app.workspace.on('editor-menu', (menu, editor) => {
+        menu.addItem(item => item
+          .setTitle('Insert Comment')
+          .setIcon('message-circle')
+          .onClick(() => this.insertComment(editor))
+        );
+      })
+    );
+
     // Invalidate cache and refresh panel when files change (e.g. Dropbox sync)
     this.registerEvent(this.app.vault.on('modify', file => {
       this._cache.delete(file.path);
