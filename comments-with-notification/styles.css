@@ -1,0 +1,131 @@
+/* ── [!comment] callout ───────────────────────────────────────────────────── */
+.callout[data-callout="comment"] {
+  --callout-color: 200, 160, 0;
+  --callout-icon: lucide-message-circle;
+}
+
+/* ── Ribbon badge ─────────────────────────────────────────────────────────── */
+.cwn-ribbon {
+  position: relative;
+}
+
+.cwn-ribbon.has-unread::after {
+  content: '!';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--color-red);
+  color: white;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  font-size: 9px;
+  font-weight: bold;
+  line-height: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ── Notification panel ───────────────────────────────────────────────────── */
+.cwn-panel {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cwn-notice,
+.cwn-empty {
+  padding: 16px;
+  color: var(--text-muted);
+  font-size: var(--font-small);
+}
+
+.cwn-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  position: sticky;
+  top: 0;
+  background: var(--background-primary);
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.cwn-count {
+  flex: 1;
+  font-weight: 600;
+  font-size: var(--font-small);
+}
+
+.cwn-btn {
+  background: var(--background-modifier-border);
+  border: none;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: var(--font-smaller);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: background-color 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.cwn-btn:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.cwn-refresh {
+  font-size: 1em;
+  padding: 2px 7px;
+}
+
+.cwn-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.cwn-item {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.cwn-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.cwn-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.cwn-creator {
+  color: var(--text-accent);
+  font-weight: 600;
+  font-size: var(--font-small);
+}
+
+.cwn-ts {
+  color: var(--text-faint);
+  font-size: var(--font-smaller);
+}
+
+.cwn-file {
+  color: var(--text-muted);
+  font-size: var(--font-smaller);
+  font-style: italic;
+}
+
+.cwn-preview {
+  margin: 0;
+  font-size: var(--font-small);
+  color: var(--text-normal);
+  line-height: 1.4;
+}
