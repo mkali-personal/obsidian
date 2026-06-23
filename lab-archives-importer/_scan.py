@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-for f in sorted(Path('.').glob('*.html')):
+for f in sorted(Path('..').glob('*.html')):
     if f.name == 'notebook_home_page.html':
         continue
     text = f.read_text(encoding='utf-8')

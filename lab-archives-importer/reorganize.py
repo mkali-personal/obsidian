@@ -66,7 +66,7 @@ def setup_output():
     if OUTPUT_DIR.exists():
         shutil.rmtree(_long(OUTPUT_DIR))
     shutil.copytree(_long(SOURCE_DIR), _long(OUTPUT_DIR),
-                    ignore=shutil.ignore_patterns(".claude", ".idea"))
+                    ignore=shutil.ignore_patterns(".claude", "../.idea"))
     print(f"      Done.\n")
 
 
