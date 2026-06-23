@@ -1,0 +1,10 @@
+{
+  "id": "image-resizer",
+  "name": "Image Resizer",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Adds a command to resize all embedded images in the current document to a configurable fixed width.",
+  "author": "mkali",
+  "authorUrl": "https://github.com/mkali-personal",
+  "isDesktopOnly": false
+}

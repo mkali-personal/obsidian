@@ -1,0 +1,2 @@
+ffmpeg -i "Comments demo.mp4" -vf "fps=10,scale=800:-1:flags=lanczos,palettegen" palette.png
+ffmpeg -i "Comments demo.mp4" -i palette.png -vf "fps=10,scale=800:-1:flags=lanczos,paletteuse" -loop 0 output.gif
